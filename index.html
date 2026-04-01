@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ThMusic</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- BACKGROUND CONTAINER -->
+    <div class="background-container" id="backgroundContainer">
+        <img id="bgImage" class="bg-image" style="display: none;" alt="Background">
+        <video id="bgVideo" autoplay muted loop playsinline style="display: none;">
+            <source id="bgVideoSource" src="imagens/background.mp4" type="video/mp4">
+        </video>
+        <div class="overlay"></div>
+    </div>
+
+    <!-- BOTÃO EDITAR FUNDO -->
+    <button class="edit-bg-btn" onclick="openBgEditor()" title="Personalizar fundo">🎨</button>
+
+    <!-- BOTÃO ADD MUSIC -->
+    <button class="add-music-btn" onclick="toggleUploadSection()" title="Adicionar música">🎵</button>
+
+    <!-- BOTÃO LOGOUT SUPERIOR -->
+    <button class="logout-top-btn" onclick="confirmLogout()" title="Sair">🚪 Logout</button>
+
+    <!-- MODAL PERSONALIZAÇÃO DE FUNDO -->
+    <div id="bgEditorModal" class="modal">
+        <div class="modal-content bg-editor-modal">
+            <div class="modal-header">
+                <h3>Personalize seu plano de fundo</h3>
+                <p class="modal-subtitle">Escolha uma imagem ou vídeo para o fundo</p>
+            </div>
+
+            <!-- Imagens Recentes -->
+            <div class="recent-section">
+                <h4>Imagens recentes</h4>
+                <div class="recent-grid" id="recentGrid"></div>
+            </div>
+
+            <!-- Escolher Arquivo -->
+            <div class="choose-section">
+                <h4>Escolher arquivo</h4>
+                <div class="choose-buttons">
+                    <label class="choose-photo-btn">
+                        📁 Selecionar arquivo
+                        <input type="file" id="bgFileInput" accept="image/*,video/*" style="display: none;" onchange="handleFileSelect()">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Ajuste da Imagem -->
+            <div class="adjust-section">
+                <h4>Ajuste da imagem</h4>
+                <div class="fit-options">
+                    <button class="fit-option" data-fit="fill" onclick="setFitMode('fill')">
+                        <div class="fit-preview fill-preview"></div>
+                        <span>Preencher</span>
+                    </button>
+                    <button class="fit-option" data-fit="contain" onclick="setFitMode('contain')">
+                        <div class="fit-preview contain-preview"></div>
+                        <span>Ajustar</span>
+                    </button>
+                    <button class="fit-option" data-fit="cover" onclick="setFitMode('cover')">
+                        <div class="fit-preview cover-preview"></div>
+                        <span>Cobrir</span>
+                    </button>
+                    <button class="fit-option" data-fit="center" onclick="setFitMode('center')">
+                        <div class="fit-preview center-preview"></div>
+                        <span>Centralizar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Configurações -->
+            <div class="settings-related">
+                <h4>Configurações</h4>
+                <div class="related-options">
+                    <button class="related-option" id="themeToggleBtn" onclick="toggleTheme()">
+                        <span>🌓</span>
+                        <span id="themeText">Tema Escuro</span>
+                    </button>
+                    <button class="related-option" onclick="resetBackground()">
+                        <span>🔄</span>
+                        <span>Restaurar padrão</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeBgEditor()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN CARD -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <h2>CUSTOMER LOGIN</h2>
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email ID" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+            </div>
+            <div class="checkbox-container">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe"> Remember me
+                </label>
+                <a class="forgot-password" onclick="resetPassword()">Forgot Password?</a>
+            </div>
+            <button class="login-btn" onclick="loginUser()">LOGIN</button>
+            <div class="register-link">
+                Don't have an account? <span onclick="showRegisterModal()">Register here</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CADASTRO -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h3>Create Account</h3>
+            <input type="email" id="regEmail" placeholder="Email ID" autocomplete="off">
+            <input type="password" id="regPassword" placeholder="Password">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeRegisterModal()">Cancel</button>
+                <button class="confirm-btn" onclick="register()">Register</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE LOGOUT -->
+    <div id="confirmLogoutModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmar Logout</h3>
+            <p style="margin: 20px 0; text-align: center;">Tem certeza que deseja sair?</p>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeConfirmModal()">Não</button>
+                <button class="confirm-btn" onclick="performLogout()" style="background: #ef4444;">Sim</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLAYER -->
+    <div class="player-container" id="playerContainer">
+        <div class="player-card">
+            <h2>Musics</h2>
+            <img id="cover" class="cover" src="https://via.placeholder.com/220x220/333/fff?text=No+Music" alt="Album cover">
+            <h3 id="title">Select a song</h3>
+            
+            <div class="bar" onclick="seek(event)">
+                <div id="progress" class="fill"></div>
+            </div>
+            <div class="time-container">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            
+            <div class="controls">
+                <button onclick="prev()">⏮</button>
+                <button onclick="toggle()" id="playBtn">▶</button>
+                <button onclick="next()">⏭</button>
+            </div>
+            
+            <div class="volume-container">
+                <span class="volume-icon" onclick="toggleMute()">🔊</span>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="80">
+                <span class="volume-value" id="volumeValue">80%</span>
+            </div>
+            
+            <div class="upload-section" id="uploadSection">
+                <h3>Add Music</h3>
+                <input type="text" id="musicName" placeholder="Song name">
+                <input type="file" id="img" accept="image/*">
+                <input type="file" id="audioFile" accept="audio/*">
+                <div id="uploadError" class="error-message"></div>
+                <button class="upload-btn" onclick="upload()">Upload Music</button>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="audio" preload="metadata"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
